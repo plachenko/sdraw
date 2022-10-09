@@ -1,0 +1,21 @@
+{
+  "name": "sdraw",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "bnd": "npm run build && npm run deploy",
+    "deploy": "npx gh-pages -d dist",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^1.0.2",
+    "svelte": "^3.49.0",
+    "vite": "^3.1.0"
+  },
+  "dependencies": {
+    "axios": "^1.0.0"
+  }
+}
