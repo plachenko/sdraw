@@ -1,10 +1,14 @@
 <script>
   import axios from 'axios';
-  import { createEventDispatcher } from 'svelte';
-    import SdCanvas from './SDCanvas.svelte';
+  import { onMount, createEventDispatcher } from 'svelte';
+  import SdCanvas from './SDCanvas.svelte';
+
   const genRanHex = size => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
   
   let blobImg;
+
+  export let imgBlob;
+
   export const send = function(blob){
     if(!blob) return;
     console.log('got blob:', blob);
@@ -14,11 +18,13 @@
     },1000);
   }
 
+  let name = 'default';
+  let ip = '127.0.0.1';
+  let port = '7860';
+
   let prompt = 'test';
   let connecting = false;
-  let netArr = [
-    {name: 'default', ip: '127.0.0.1', port: '7860'}
-  ];
+  let netArr = [];
 
   const dispatch = createEventDispatcher();
   
@@ -56,6 +62,17 @@
       ''
     ]
   };
+
+  onMount((e)=>{
+    axios.post(`http://${ip}:${port}/api/predict`, {
+      data: [],
+      fn_index: 163,
+      session_hash: genRanHex(10)
+    });
+    localStorage.removeItem('ipStore');
+    netArr = localStorage.getItem('ipStore') || [{name: name, ip: ip, port: port}];
+    console.log(netArr);
+  });
 
   /*
   const networkObj = {
@@ -231,7 +248,7 @@
         ""
     ],
     "session_hash": "cvg4wti8xwh"
-};
+  };
 
   let curStatus = 0;
   const statusArr = [
@@ -247,8 +264,8 @@
     let port = curNetwork.port || '7860';
     connecting = true;
 
-    // console.log(networkObj);s
-    console.log(blobImg)
+    console.log(imgBlob);
+    return;
 
     axios.post(`http://${ip}:${port}/api/predict`, {
     "fn_index": 28,
@@ -349,10 +366,10 @@
     });
   }
 
-  function clickEvt(e){
-    e.preventDefault();
+  function handleSubmit(e){
     dispatch('connecting');
-    console.log('test');
+
+    console.log(imgBlob);
   }
 
   function inputChangeEvt(e){
@@ -367,73 +384,82 @@
     }
   }
 
+  function saveIP(){
+    netArr.push({
+      name: name,
+      ip: ip,
+      port: port
+    });
+
+    console.log(netArr);
+
+    /* localStorage.setItem('ipStore', netArr) */
+  }
+
 </script>
 
 <div id="SDConnectContainer">
-  <form id="SDConnectInput">
+  <div class="row">
+    <div class='item' style="background-color:#F00;">
+      t
+    </div>
+    <div class='item' style="background-color:#FFF;">f</div>
+    <div class='item' style="background-color:#F0F;">g</div>
+  </div>
+  <!--
+  <form id="SDConnectInput" on:submit|preventDefault={handleSubmit}>
 
-    <select bind:value={curNetwork} on:change={netChangeEvt}>
-      {#each netArr as network}
-        <option value={network}>{network.name}</option>
-      {/each}
-    </select>
+      <div class="row">
+        <select bind:value={curNetwork} on:change={netChangeEvt}>
+          {#each netArr as network}
+            <option value={network}>{network.name}</option>
+          {/each}
+        </select>
+      
+        <label for="ip">IP</label>
+        <input 
+          id="ip" 
+          name="ip" 
+          bind:value={ip} 
+          type="input" 
+          placeholder="ip" />
     
-      <label for="ip">IP</label>
-      <input 
-        id="ip" 
-        name="ip" 
-        bind:value={curNetwork.ip} 
-        type="input" 
-        placeholder="ip" />
-  
-      <label for="port">Port</label>
-      <input 
-        bind:value={curNetwork.port} 
-        id="port" 
-        name="port"
-        placeholder="port" 
-        type="input" />
+        <label for="port">Port</label>
+        <input 
+          bind:value={port} 
+          id="port" 
+          name="port"
+          placeholder="port" 
+          type="input" />
 
-        <br />
-      <input bind:value={prompt} />
-      <button on:click={clickEvt}>Send</button>
+        <div style="background-color:#F00;" on:click={saveIP}>Save</div>
+      </div>
 
-    <!-- --
-      <hr />
+      <div class="row">
+        <input bind:value={prompt} />
+        <button>Make Art</button>
+      </div>
 
-      {#each dataArr as data}
-        <input type={data.type} on:input={inputChangeEvt} />
-      {/each}
-    
-    <label for="port" style="float:left;">Prompt</label>
-    <input 
-      id="port" 
-      name="port" 
-      bind:value={port} 
-      placeholder="port" 
-      type="input" />
-
-    <hr />
-    <label for="port" style="float:left;">Prompt</label>
-    <input 
-      id="port" 
-      name="port" 
-      bind:value={port} 
-      placeholder="port" 
-      type="input" />
- -->
   </form>
   {#if connecting}
     <div id="SDConnectStatus" style="background-color: {statusArr[curStatus].color}">{statusArr[curStatus].name}</div>
   {/if}
+  -->
 </div>
 
 <style>
   form{
     margin: 0px;
     padding: 0px;
-  }
+    display: flex;
+    flex: 1;
+    width:100%;
+    flex-wrap: wrap;
+    }
+
   input{
+    flex: 1 1 160px;
+    margin: 0px 5px;
     border: none;
     border-bottom: 1px solid;
     background-color: #FFF;
@@ -444,7 +470,21 @@
     color: #000;
     /* position: absolute; */
     /* top: 0px; */
+    flex: 1;
+    display: flex;
     }
+  #SDConnectContainer .item{
+    flex: 1 1 160px;
+  }
+  #SDConnectContainer .row{
+    display: flex;
+    flex-direction: row;
+  }
+  #SDContainer .row > div{
+    flex: 1;
+    /* width: 100px; */
+    width: 100%;
+  }
   #SDConnectStatus{
     background-color:#F00;
     }
@@ -452,4 +492,10 @@
     #SDConnectInput{
       padding: 10px;
     }
+
+    /*
+    .row{
+      flex: 1;
+    }
+    */
 </style>

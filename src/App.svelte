@@ -5,10 +5,15 @@
   import svelteLogo from './assets/svelte.svg'
   import Counter from './lib/Counter.svelte'
 
+  export let imgBlob;
   let SDCan;
   let SDCon;
 
   let blob='';
+
+  onMount(()=>{
+    console.log(imgBlob);
+  });
 
   function imgRet(e){
     console.log(e.detail);
@@ -16,8 +21,10 @@
   }
 
   function connectEvt(conEl){
+    console.log('connect.');
     SDCan.toBlob();
-    SDCon.send(blob);
+    console.log(imgBlob,'t');
+    /* SDCon.send(imgBlob); */
   }
 </script>
 
@@ -26,7 +33,7 @@
     <SDConnect on:imgRet={imgRet} bind:this={SDCon} on:connecting={connectEvt} />
   </div>
   <div id="mainCont">
-    <SDCanvas bind:imgBlob={blob} bind:this={SDCan} />
+    <SDCanvas bind:imgBlob={imgBlob} bind:this={SDCan} />
   </div>
 
 </main>

@@ -62,15 +62,12 @@
   export const toBlob = function(el){
     let  url = '';
     canvas.toBlob((e)=>{
-      
       let reader = new FileReader();
       reader.readAsDataURL(e);
       reader.onloadend = function(){
         let base64 = reader.result;
-        // console.log(base64);
         imgBlob = base64;
       }
-
     })
   }
 
