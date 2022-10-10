@@ -2,8 +2,11 @@
   import { onMount } from 'svelte';
   import SDConnect from './components/SDConnect.svelte';
   import SDCanvas from './components/SDCanvas.svelte';
+  import SDLayer from './components/SDLayer.svelte';
   import svelteLogo from './assets/svelte.svg'
   import Counter from './lib/Counter.svelte'
+
+  import SDNetwork from './components/SDNetwork.svelte';
 
   export let imgBlob;
   let SDCan;
@@ -30,10 +33,16 @@
 
 <main>
   <div id="header">
-    <SDConnect on:imgRet={imgRet} bind:this={SDCon} on:connecting={connectEvt} />
+    <!--
+    <SDNetwork on:imgRet={imgRet} bind:this={SDCon} on:connecting={connectEvt} />
+    -->
+    <!--<SDConnect on:imgRet={imgRet} bind:this={SDCon} on:connecting={connectEvt} />-->
   </div>
   <div id="mainCont">
+    <!--
     <SDCanvas bind:imgBlob={imgBlob} bind:this={SDCan} />
+    -->
+    <SDLayer />
   </div>
 
 </main>

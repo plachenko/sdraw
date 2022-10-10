@@ -1,15 +1,8 @@
 <script>
     import { onMount } from 'svelte';
   
-    export let curCol = '#000';
-    /* export let lineWidth = '1'; */
-
     let canvas;
     let ctx;
-
-    let strokeArr = [];
-    let pdn = false;
-    let drawInt = null;
 
     export const toBlob = function(el){
       let  url = '';
@@ -27,8 +20,6 @@
     }
   
     onMount(() => {
-      canvas.width = 512;
-      canvas.height = 512;
       ctx = canvas.getContext('2d');
     });
 
@@ -126,4 +117,3 @@
   </style>
   
   
-

@@ -472,6 +472,7 @@
     /* top: 0px; */
     flex: 1;
     display: flex;
+    width:100%;
     }
   #SDConnectContainer .item{
     flex: 1 1 160px;
