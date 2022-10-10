@@ -15,7 +15,7 @@
   let blob='';
 
   onMount(()=>{
-    console.log(imgBlob);
+    // console.log(imgBlob);
   });
 
   function imgRet(e){
@@ -28,6 +28,10 @@
     SDCan.toBlob();
     console.log(imgBlob,'t');
     /* SDCon.send(imgBlob); */
+  }
+
+  function drawEvt(){
+    console.log('sent');
   }
 </script>
 
@@ -42,7 +46,7 @@
     <!--
     <SDCanvas bind:imgBlob={imgBlob} bind:this={SDCan} />
     -->
-    <SDLayer />
+    <SDLayer on:drawEvt={drawEvt} />
   </div>
 
 </main>

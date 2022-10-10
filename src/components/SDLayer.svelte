@@ -1,14 +1,18 @@
 <script>
-    import { onMount } from 'svelte';
+    import { onMount, createEventDispatcher } from 'svelte';
   
     export let curCol = '#000';
     /* export let lineWidth = '1'; */
+
+    const dispatch = createEventDispatcher();
+
 
     let canvas;
     let ctx;
 
     let strokeArr = [];
     let pdn = false;
+    let pout = false;
     let drawInt = null;
 
     export const toBlob = function(el){
@@ -30,6 +34,12 @@
       canvas.width = 512;
       canvas.height = 512;
       ctx = canvas.getContext('2d');
+
+      document.addEventListener('pointerup', (e) => {
+        if(!pout) return;
+        pUp();
+        pout = false;
+      });
     });
 
     function draw(){
@@ -66,6 +76,18 @@
       draw();
     }
   
+    function pOut(){
+      if(pdn){
+        pout = true;
+      }
+    }
+
+    function pIn(){
+      if(pdn){
+        pout = false;
+      }
+    }
+
     function pUp(){
       clearInterval(drawInt);
       drawInt = null;
@@ -73,10 +95,11 @@
       pdn = false;
       strokeArr = [];
 
-      console.log('send');
+      dispatch('drawEvt');
     }
   
     function pMv(e){
+      if(pout) return;
       if(pdn){
         strokeArr.push([e.offsetX, e.offsetY]);
       }
@@ -98,6 +121,8 @@
       on:pointerdown={pDn}
       on:pointerup={pUp}
       on:pointermove={pMv}
+      on:pointerout={pOut}
+      on:pointerenter={pIn}
       >
     </div>
   
