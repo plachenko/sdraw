@@ -93,7 +93,9 @@
       drawInt = null;
 
       pdn = false;
+
       strokeArr = [];
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       dispatch('drawEvt');
     }
