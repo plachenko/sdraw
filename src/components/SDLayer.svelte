@@ -2,11 +2,10 @@
     import { onMount, createEventDispatcher } from 'svelte';
   
     export let curCol = '#000';
+    export let curTool = 'pen';
     /* export let lineWidth = '1'; */
 
     const dispatch = createEventDispatcher();
-
-
     let canvas;
     let ctx;
 
@@ -14,6 +13,7 @@
     let pdn = false;
     let pout = false;
     let drawInt = null;
+    export let imgBlob;
 
     export const toBlob = function(el){
       let  url = '';
@@ -23,10 +23,9 @@
         reader.readAsDataURL(e);
         reader.onloadend = function(){
           let base64 = reader.result;
-          // console.log(base64);
           imgBlob = base64;
+          dispatch('blob', base64);
         }
-  
       })
     }
   
@@ -34,6 +33,10 @@
       canvas.width = 512;
       canvas.height = 512;
       ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = "#FF0";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#000";
 
       document.addEventListener('pointerup', (e) => {
         if(!pout) return;
@@ -44,12 +47,19 @@
 
     function draw(){
       drawInt = setInterval((e) => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        pen();
+        // ctx.clearRect(0, 0, canvas.width, canvas.height);
+        switch(curTool){
+          case 'pen':
+            pen();
+            break;
+          case 'fill':
+            fill();
+            break;
+        }
       }, 10);
     }
 
-    function pen(){
+    function pen() {
       strokeArr.forEach((e, idx) => {
         if(idx < 1) return;
         ctx.moveTo(strokeArr[idx-1][0],  strokeArr[idx-1][1]);
@@ -58,7 +68,7 @@
       ctx.stroke();
     }
 
-    function fill(){
+    function fill() {
       ctx.beginPath();
       strokeArr.forEach((e, idx) => {
         if(idx < 1) return;
@@ -91,13 +101,14 @@
     function pUp(){
       clearInterval(drawInt);
       drawInt = null;
-
       pdn = false;
 
-      strokeArr = [];
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      dispatch('drawEvt', strokeArr);
+      
+      // ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // canvas.width = canvas.width;
 
-      dispatch('drawEvt');
+      strokeArr = [];
     }
   
     function pMv(e){
@@ -151,6 +162,3 @@
   }
   
   </style>
-  
-  
-

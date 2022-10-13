@@ -6,10 +6,8 @@
   const genRanHex = size => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
   
   let blobImg;
-
-  export let imgBlob;
-
   export const send = function(blob){
+    console.log(blob);
     if(!blob) return;
     console.log('got blob:', blob);
     blobImg = blob; 
@@ -27,7 +25,6 @@
   let netArr = [];
 
   const dispatch = createEventDispatcher();
-  
 
   let curNetwork = netArr[0];
 
@@ -74,180 +71,18 @@
     console.log(netArr);
   });
 
-  /*
-  const networkObj = {
-    "fn_index": 28,
-    "data": [
-        0,
-        SDProps.prompt,
-        SDProps.negPrompt,
-        SDProps.style[0],
-        SDProps.style[1],
-        SDProps.imgs[0],
-        {
-          "image": SDProps.imgs[1],
-          "mask": SDProps.imgs[2]
-        },
-        null,
-        null,
-        "Draw mask",
-        20,
-        "Euler a",
-        13,
-        "latent noise",
-        false,
-        false,
-        1,
-        1,
-        23.5,
-        SDProps.blurAmt,
-        -1,
-        -1,
-        0.33,
-        0,
-        0,
-        false,
-        512,
-        512,
-        "Just resize",
-        false,
-        32,
-        "Inpaint masked",
-        "",
-        "",
-        "None",
-        "",
-        "",
-        1,
-        50,
-        0,
-        false,
-        12,
-        0.95,
-        SDProps.hints[0], 
-        128,
-        8,
-        [
-            "left",
-            "right",
-            "up",
-            "down"
-        ],
-        1,
-        0.05,
-        128,
-        4,
-        "fill",
-        [
-            "left",
-            "right",
-            "up",
-            "down"
-        ],
-        false,
-        null,
-        "",
-        false,
-        SDProps.hints[1],
-        64,
-        "None",
-        "Seed",
-        "",
-        "Steps",
-        "",
-        true,
-        false,
-        null,
-        "",
-        SDProps.hints[2],
-    ],
-    "session_hash": SDProps.sessionHash
-  };
-  */
-  const networkObj = {
-    "fn_index": 28,
-    "data": [
-        0,
-        prompt,
-        "",
-        "None",
-        "None",
-        blobImg,
-        null,
-        null,
-        null,
-        "Draw mask",
-        20,
-        "Euler a",
-        4,
-        "fill",
-        false,
-        false,
-        1,
-        1,
-        7,
-        0.75,
-        -1,
-        -1,
-        0,
-        0,
-        0,
-        false,
-        512,
-        512,
-        "Just resize",
-        false,
-        32,
-        "Inpaint masked",
-        "",
-        "",
-        "None",
-        "",
-        "",
-        1,
-        50,
-        0,
-        false,
-        4,
-        1,
-        "<p style=\"margin-bottom:0.75em\">Recommended settings: Sampling Steps: 80-100, Sampler: Euler a, Denoising strength: 0.8</p>",
-        128,
-        8,
-        [
-            "left",
-            "right",
-            "up",
-            "down"
-        ],
-        1,
-        0.05,
-        128,
-        4,
-        "fill",
-        [
-            "left",
-            "right",
-            "up",
-            "down"
-        ],
-        false,
-        null,
-        "",
-        false,
-        "<p style=\"margin-bottom:0.75em\">Will upscale the image to twice the dimensions; use width and height sliders to set tile size</p>",
-        64,
-        "None",
-        "Seed",
-        "",
-        "Steps",
-        "",
-        true,
-        false,
-        null,
-        "",
-        ""
-    ],
-    "session_hash": "cvg4wti8xwh"
+  const SDObj = {
+    prompt: prompt,
+    neg: '',
+    blob: null,
+    sampleSteps: 20,
+    sampleMethod: 'Euler a',
+    CFGScale: 7,
+    denoise: .6,
+    dim: {
+      w: 512,
+      h: 512
+    }
   };
 
   let curStatus = 0;
@@ -260,44 +95,44 @@
   let imRet;
 
   function sendEvt(){
-    let ip = curNetwork.ip || '127.0.0.1';
-    let port = curNetwork.port || '7860';
+    // let ip = curNetwork.ip || '127.0.0.1';
+    // let port = curNetwork.port || '7860';
     connecting = true;
 
-    console.log(imgBlob);
-    return;
+    SDObj.prompt = prompt
+    SDObj.blob = blobImg;
 
     axios.post(`http://${ip}:${port}/api/predict`, {
-    "fn_index": 28,
+    "fn_index": 31,
     "data": [
         0,
-        prompt,
-        "",
+        SDObj.prompt,
+        SDObj.neg,
         "None",
         "None",
-        blobImg,
+        SDObj.blob, 
         null,
         null,
         null,
         "Draw mask",
-        20,
-        "Euler a",
+        SDObj.sampleSteps,
+        SDObj.sampleMethod,
         4,
         "fill",
         false,
         false,
         1,
         1,
-        16,
-        0.3,
+        SDObj.CFGScale,
+        SDObj.denoise,
         -1,
         -1,
         0,
         0,
         0,
         false,
-        512,
-        512,
+        SDObj.dim.w,
+        SDObj.dim.h,
         "Just resize",
         false,
         32,
@@ -334,26 +169,24 @@
             "down"
         ],
         false,
+        false,
         null,
         "",
-        false,
-        "<p style=\"margin-bottom:0.75em\">Will upscale the image to twice the dimensions; use width and height sliders to set tile size</p>",
+        "", //html hint
         64,
         "None",
         "Seed",
         "",
-        "Steps",
+        "Nothing",
         "",
         true,
         false,
         null,
-        "",
-        ""
+        "", //html hint
+        ""  //html hint
     ],
-    "session_hash": "cvg4wti8xwh"
-}
-    
-    ).then((e)=>{
+    "session_hash": "smr4vp09g4"
+  }).then((e)=>{
       imRet = e.data.data[0][0];
       dispatch('imgRet', imRet);
       connecting = false;
@@ -369,7 +202,7 @@
   function handleSubmit(e){
     dispatch('connecting');
 
-    console.log(imgBlob);
+    // console.log(imgBlob);
   }
 
   function inputChangeEvt(e){
@@ -399,16 +232,7 @@
 </script>
 
 <div id="SDConnectContainer">
-  <div class="row">
-    <div class='item' style="background-color:#F00;">
-      t
-    </div>
-    <div class='item' style="background-color:#FFF;">f</div>
-    <div class='item' style="background-color:#F0F;">g</div>
-  </div>
-  <!--
   <form id="SDConnectInput" on:submit|preventDefault={handleSubmit}>
-
       <div class="row">
         <select bind:value={curNetwork} on:change={netChangeEvt}>
           {#each netArr as network}
@@ -439,12 +263,12 @@
         <input bind:value={prompt} />
         <button>Make Art</button>
       </div>
-
   </form>
+
   {#if connecting}
     <div id="SDConnectStatus" style="background-color: {statusArr[curStatus].color}">{statusArr[curStatus].name}</div>
   {/if}
-  -->
+  
 </div>
 
 <style>
